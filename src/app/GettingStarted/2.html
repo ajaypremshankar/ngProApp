@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html ng-app = "myApp">
+<head>
+  <title>TO DO List</title>
+  <script src="../../angularjs/angular.js"></script>
+  <link href="../../angularjs/bootstrap.css" rel="stylesheet" />
+  <link href="../../angularjs/bootstrap-theme.css" rel="stylesheet" />
+
+  <script>
+  var model = {
+    user: "Adam"
+  };
+
+  var app = angular.module("myApp", []);
+
+  app.run(function ($http) {
+    $http.get("todo.json").success(function (data) {
+      model.items = data;
+    });
+  });
+
+  app.filter("searchFilter", function(){
+    return function(items, newItem){
+      if(newItem == undefined || newItem == ''){
+        return items;
+      }
+      var filteredArr = [];
+      angular.forEach(items, function(item){
+        if(item.action.indexOf(newItem) !== -1){
+          filteredArr.push(item);
+        }
+      });
+      return filteredArr;
+    }
+  });
+
+  app.controller("ToDoCtrl", function($scope){
+    $scope.todo = model;
+
+    $scope.countIncompleteTodos = function(){
+      var count = 0;
+      angular.forEach($scope.todo.items, function(item){
+        if (!item.done){ count ++;}
+      });
+      return count;
+    }
+
+    $scope.warningLevel = function(){
+      return $scope.countIncompleteTodos() < 3 ? "label-success" : "label-warning";
+    }
+
+    $scope.addNewItem = function(newItem){
+      $scope.todo.items.push({action: newItem, done: false});
+      $scope.newItem = "";
+    }
+    $scope.removeTodo = function(item){
+      var index = $scope.todo.items.indexOf(item);
+      $scope.todo.items.splice(index, 1);
+    }
+
+  });
+  </script>
+</head>
+<body ng-controller = "ToDoCtrl as vm">
+  <div class="page-header">
+    <h1>{{todo.user}}'s To Do List
+      <span class="label label-default" ng-class="warningLevel()"
+      ng-hide="countIncompleteTodos() == 0">
+      {{countIncompleteTodos()}}
+    </span></h1>
+  </div>
+  <div class="panel">
+    <div class="input-group">
+      <input class="form-control" ng-model="newItem" />
+      <span class="input-group-btn">
+        <button class="btn btn-default" ng-click="addNewItem(newItem)">Add</button>
+      </span>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Done</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat = "item in todo.items | searchFilter: newItem" ng-dblclick="removeTodo(item)">
+          <td>{{item.action}}</td>
+          <td><input type="checkbox" ng-model="item.done" /></td>
+          <td>{{item.done ? "Yes" : "No"}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

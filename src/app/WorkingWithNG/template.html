@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html ng-app="exampleApp">
+<head>
+  <title>{{PageTitle}}</title>
+  <script src="angularjs/angular.js"></script>
+  <link href="angularjs/bootstrap.css" rel="stylesheet" />
+  <link href="angularjs/bootstrap-theme.css" rel="stylesheet" />
+  <script>
+  var app = angular.module('exampleApp', []);
+  app.controller('dayCtrl', function($scope){
+    var dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday",
+  "Thursday", "Friday", "Saturday"];
+  $scope.day = dayNames[new Date().getDay()];
+  });
+
+  app.directive("highlight", function(){
+    return function(scope, element, attrs){
+      if(scope.day === attrs["highlight"]){
+        element.css("color", "red");
+      }
+    }
+  });
+  </script>
+</head>
+<body>
+  <div class="panel" ng-controller="dayCtrl">
+    <div class="page-header">
+      <h3>AngularJS App</h3>
+    </div>
+    <h4 highlight="Thursday">Today is {{day || "(unknown)"}}</h4>
+  </div>
+</body>
+</html>

@@ -1,4 +1,6 @@
 *.class
+node_modules
+src/deployd
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
